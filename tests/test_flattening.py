@@ -1,6 +1,6 @@
 from __future__ import annotations
+
 from unittest.mock import ANY
-from uuid import UUID
 
 from src.main import flatten_model_instance
 from src.models import Address, BankDetails, Category, Contact, Supplier, SupplierCategory
