@@ -54,8 +54,10 @@ def generate_secondary_row(relationship: Relationship, parent: DeclarativeBase, 
             if foreign_key.column.table == parent.__table__
             else getattr(child, foreign_key.column.key)
         )
+        if STRINGIFY_UUIDS and isinstance(secondary_dict[column.key], UUID):
+            secondary_dict[column.key] = str(secondary_dict[column.key])
     if INSERT_SECONDARY_ID:
-        secondary_dict[SECONDARY_ID_COLUMN_NAME] = uuid4()
+        secondary_dict[SECONDARY_ID_COLUMN_NAME] = str(uuid4()) if STRINGIFY_UUIDS else uuid4()
 
     return secondary_dict
 
