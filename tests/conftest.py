@@ -28,6 +28,8 @@ def supplier(categories: list[Category]) -> Supplier:
         name="Loros Grist",
         email="info@loros.example",
         created_at=datetime(2020, 2, 21),
+        address_id=UUID("c5fb851f-63fd-4572-872c-3597186c9afe"),
+        bank_details_id=UUID("ccd390cf-a74c-4897-a923-3d77ce1b97bf"),
         address=Address(
             id=UUID("c5fb851f-63fd-4572-872c-3597186c9afe"),
             line_1="Celestia",
@@ -43,6 +45,8 @@ def supplier(categories: list[Category]) -> Supplier:
                 id=UUID("98a11210-949a-48ad-99c7-1d89c54c2a53"),
                 name="Sveimann Glort",
                 email="sveimann@loros.example",
+                address_id=UUID("cd521f7e-df61-4079-b44d-35015b9b5110"),
+                supplier_id=UUID("2b7e7211-d2c7-4eb4-8c14-05ed58c77473"),
                 address=Address(
                     id=UUID("cd521f7e-df61-4079-b44d-35015b9b5110"),
                     line_1="The imperial road",
