@@ -1,4 +1,18 @@
 {
+    "files.exclude": {
+        "**/._*": true,
+        "**/*.pyc": {
+            "when": "$(basename).py"
+        },
+        "**/__pycache__": true,
+        "**/.pytest_cache": true,
+        ".coverage": true,
+        ".idea": true,
+        ".mypy_cache": true,
+        ".pytest_cache": true,
+        ".ruff_cache": true,
+        ".venv": false,
+    },
     "python.testing.pytestArgs": [
         "tests"
     ],
