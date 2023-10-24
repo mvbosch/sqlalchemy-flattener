@@ -15,6 +15,9 @@ STRINGIFY_UUIDS = True
 STRINGIFY_DATES = True
 USE_ENUM_VALUES = True
 
+# TODO: improve global variable use
+back_populates_tracker = []
+
 
 def flatten_model_instance(
     model: DeclarativeBase, data_map: dict[Table, list[dict[str, Any]]]
@@ -25,9 +28,17 @@ def flatten_model_instance(
     _append_mapping(data_map, model.__table__, model_columns_to_dict(model))
 
     for relationship in inspector.mapper.relationships:
+        # avoid infinite recursion when circular references are present
+        if relationship.back_populates:
+            if (combination := {model.__tablename__, relationship.target.name}) in back_populates_tracker:
+                continue
+            else:
+                back_populates_tracker.append(combination)
         if relationship.uselist:
             for child in getattr(model, relationship.key):
+                # recursive flattening
                 data_map = flatten_model_instance(child, data_map)
+
                 if relationship.secondary is not None:
                     secondary_dict = generate_secondary_row(relationship, model, child)
                     _append_mapping(data_map, relationship.secondary, secondary_dict)

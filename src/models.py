@@ -46,6 +46,7 @@ class Contact(Base):
     supplier_id: Mapped[UUID] = mapped_column(Uuid(), ForeignKey("supplier.id"), nullable=False)
     # relationships
     address: Mapped[Address] = relationship(lazy="noload")
+    supplier: Mapped["Supplier"] = relationship(lazy="noload", back_populates="contacts")
 
 
 class Supplier(Base):
@@ -62,7 +63,7 @@ class Supplier(Base):
     address: Mapped[Address] = relationship(lazy="noload")
     bank_details: Mapped[BankDetails] = relationship(lazy="noload")
     categories: Mapped[list[Category]] = relationship(lazy="noload", secondary="supplier_category")
-    contacts: Mapped[list[Contact]] = relationship(lazy="noload")
+    contacts: Mapped[list[Contact]] = relationship(lazy="noload", back_populates="supplier")
 
 
 class SupplierCategory(Base):
