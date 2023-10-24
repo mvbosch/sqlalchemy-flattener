@@ -7,7 +7,7 @@ from uuid import UUID, uuid4
 from sqlalchemy import Table, inspect
 from sqlalchemy.orm import DeclarativeBase, Relationship
 
-# set these as settings or arguments
+# TODO: change to configuration or function arguments
 INSERT_SECONDARY_ID = True
 SECONDARY_ID_TYPE = "uuid"
 SECONDARY_ID_COLUMN_NAME = "id"
@@ -56,7 +56,8 @@ def _append_mapping(data_map: dict[Table, list[dict[str, Any]]], table: Table, d
     return data_map
 
 
-def generate_secondary_row(relationship: Relationship, parent: DeclarativeBase, child: DeclarativeBase):
+def generate_secondary_row(relationship: Relationship, parent: DeclarativeBase, child: DeclarativeBase) -> dict[str, Any]:
+    """Generate rows for secondary a.k.a. association tables."""
     secondary_dict = {}
     for column in relationship.remote_side:
         foreign_key = next(iter(column.foreign_keys))
