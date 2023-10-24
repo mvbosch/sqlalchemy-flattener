@@ -84,7 +84,13 @@ def get_data_mapping(data: DeclarativeBase | Sequence[DeclarativeBase]) -> dict[
     for model in data:
         data_map = flatten_model_instance(model, data_map)
 
-    return data_map
+    return deduplicate_data_mapping(data_map)
+
+
+def deduplicate_data_mapping(data_map: dict[Table, list[dict[str, Any]]]) -> dict[Table, list[dict[str, Any]]]:
+    """Deduplicate data mapping values."""
+
+    return {table: [dict(t) for t in {tuple(d.items()) for d in values}] for table, values in data_map.items()}
 
 
 def write_mapping(data: dict[Table, list[dict[str, Any]]], path: str) -> None:
