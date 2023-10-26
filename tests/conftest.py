@@ -3,8 +3,7 @@ from uuid import UUID
 
 import pytest
 
-from src.enums import AccountType
-from src.models import Address, BankDetails, Category, Contact, Supplier
+from examples.models import AccountType, Address, BankDetails, Category, Contact, Supplier
 
 
 @pytest.fixture
@@ -59,10 +58,6 @@ def supplier(categories: list[Category]) -> Supplier:
 @pytest.fixture
 def supplier_categories(categories: list[Category]) -> list[Supplier]:
     return [
-        Supplier(
-            id=UUID("330b18d4-5b92-49e5-b899-394dafd19e95"), categories=categories
-        ),
-        Supplier(
-            id=UUID("ca8e7bb6-898f-47d4-98f8-e5b560ed364e"), categories=categories
-        ),
+        Supplier(id=UUID("330b18d4-5b92-49e5-b899-394dafd19e95"), categories=categories),
+        Supplier(id=UUID("ca8e7bb6-898f-47d4-98f8-e5b560ed364e"), categories=categories),
     ]

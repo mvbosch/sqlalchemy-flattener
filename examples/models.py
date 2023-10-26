@@ -1,11 +1,23 @@
 from datetime import datetime
+from enum import Enum
+from typing import Any
 from uuid import UUID
 
-from sqlalchemy import DateTime, Enum, ForeignKey, Text, Uuid
+from sqlalchemy import DateTime, ForeignKey, Text, Uuid
+from sqlalchemy import Enum as SQLEnum
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
-from src.enums import AccountType
-from src.utils import get_enum_values
+
+class AccountType(str, Enum):
+    """Bank account types."""
+
+    CASH = "cash"
+    CREDIT = "credit"
+
+
+def get_enum_values(enum_class: "Enum") -> list[Any]:
+    """Retrieve a list of values associated with an Enum type."""
+    return [e.value for e in enum_class]
 
 
 class Base(DeclarativeBase):
@@ -25,7 +37,7 @@ class BankDetails(Base):
 
     account_number: Mapped[str] = mapped_column(Text(), nullable=False)
     account_type: Mapped[AccountType] = mapped_column(
-        Enum(AccountType, name="bank_account_type", values_callable=get_enum_values), nullable=False
+        SQLEnum(AccountType, name="bank_account_type", values_callable=get_enum_values), nullable=False
     )
 
 
@@ -68,6 +80,7 @@ class Supplier(Base):
 
 class SupplierCategory(Base):
     """Supplier to category association table."""
+
     __tablename__ = "supplier_category"
 
     supplier_id: Mapped[UUID] = mapped_column(Uuid(), ForeignKey("supplier.id"))

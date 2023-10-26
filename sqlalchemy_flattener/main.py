@@ -19,7 +19,7 @@ USE_ENUM_VALUES = True
 back_populates_tracker = []
 
 
-def flatten_model_instance(
+def flatten_instance(
     model: DeclarativeBase, data_map: dict[Table, list[dict[str, Any]]]
 ) -> dict[Table, list[dict[str, Any]]]:
     """Flatten SQLAlchemy models to dictionaries ready for bulk insertion."""
@@ -40,14 +40,14 @@ def flatten_model_instance(
                 collection = collection.values()
             for child in collection:
                 # recursive flattening
-                data_map = flatten_model_instance(child, data_map)
+                data_map = flatten_instance(child, data_map)
 
                 if relationship.secondary is not None:
                     secondary_dict = generate_secondary_row(relationship, model, child)
                     _append_mapping(data_map, relationship.secondary, secondary_dict)
         else:
             if (child := getattr(model, relationship.key)) is not None:
-                data_map = flatten_model_instance(child, data_map)
+                data_map = flatten_instance(child, data_map)
 
     return data_map
 
@@ -79,7 +79,7 @@ def generate_secondary_row(
     return secondary_dict
 
 
-def get_data_mapping(data: DeclarativeBase | Sequence[DeclarativeBase]) -> dict[Table, list[dict[str, Any]]]:
+def flatten(data: DeclarativeBase | Sequence[DeclarativeBase]) -> dict[Table, list[dict[str, Any]]]:
     """Flatten SQLAlchemy models to dictionaries ready for bulk insertion."""
 
     if not isinstance(data, Sequence):
@@ -87,7 +87,7 @@ def get_data_mapping(data: DeclarativeBase | Sequence[DeclarativeBase]) -> dict[
 
     data_map = {}
     for model in data:
-        data_map = flatten_model_instance(model, data_map)
+        data_map = flatten_instance(model, data_map)
 
     return deduplicate_data_mapping(data_map)
 

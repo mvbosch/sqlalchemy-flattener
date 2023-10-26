@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "treestump"
+name = "sqlalchemy-flattener"
 version = "0.1.0"
 description = "Flatten SQLAlchemy model trees to raw data"
 authors = ["LonelyVikingMichael <michael@lonelyviking.com>"]
@@ -16,3 +16,6 @@ pytest = "^7.4.2"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.ruff.isort]
+known-first-party = ["sqlalchemy_flattener", "tests", "examples"]

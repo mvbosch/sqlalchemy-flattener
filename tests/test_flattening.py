@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from unittest.mock import ANY
 
-from src.main import get_data_mapping
-from src.models import (
+from sqlalchemy_flattener import flatten
+from examples.models import (
     Address,
     BankDetails,
     Category,
@@ -14,7 +14,7 @@ from src.models import (
 
 
 def test_flatten_model_instance(supplier: Supplier) -> None:
-    data = get_data_mapping(supplier)
+    data = flatten(supplier)
 
     assert data[Supplier.__table__] == [
         {
@@ -80,7 +80,7 @@ def test_flatten_model_instance(supplier: Supplier) -> None:
 
 
 def test_dedupe_many_to_many(supplier_categories: list[Supplier]) -> None:
-    data = get_data_mapping(supplier_categories)
+    data = flatten(supplier_categories)
     assert len(data[Category.__table__]) == 2
     assert all(
         d in data[Category.__table__]
