@@ -1,9 +1,18 @@
+from __future__ import annotations
+
 from datetime import datetime
 from uuid import UUID
 
 import pytest
 
-from examples.models import AccountType, Address, BankDetails, Category, Contact, Supplier
+from examples.models import (
+    AccountType,
+    Address,
+    BankDetails,
+    Category,
+    Contact,
+    Supplier,
+)
 
 
 @pytest.fixture

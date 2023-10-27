@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import datetime
 from enum import Enum
 from typing import Any
@@ -37,7 +39,8 @@ class BankDetails(Base):
 
     account_number: Mapped[str] = mapped_column(Text(), nullable=False)
     account_type: Mapped[AccountType] = mapped_column(
-        SQLEnum(AccountType, name="bank_account_type", values_callable=get_enum_values), nullable=False
+        SQLEnum(AccountType, name="bank_account_type", values_callable=get_enum_values),
+        nullable=False,
     )
 
 

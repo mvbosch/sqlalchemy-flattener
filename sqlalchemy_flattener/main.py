@@ -1,11 +1,28 @@
+from __future__ import annotations
+
 from collections.abc import Sequence
 from datetime import date
 from enum import Enum
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from uuid import UUID, uuid4
 
-from sqlalchemy import Table, inspect
-from sqlalchemy.orm import DeclarativeBase, KeyFuncDict, Relationship
+from sqlalchemy import inspect
+from sqlalchemy.orm import KeyFuncDict
+
+if TYPE_CHECKING:
+    from sqlalchemy import Table
+    from sqlalchemy.orm import DeclarativeBase, Relationship
+
+__all__ = [
+    "deduplicate_data_mapping",
+    "flatten",
+    "flatten_instance",
+    "generate_secondary_row",
+    "model_columns_to_dict",
+    "write_raw",
+    "write_sql",
+]
+
 
 # TODO: change to configuration or function arguments
 INSERT_SECONDARY_ID = True
@@ -79,7 +96,9 @@ def generate_secondary_row(
     return secondary_dict
 
 
-def flatten(data: DeclarativeBase | Sequence[DeclarativeBase]) -> dict[Table, list[dict[str, Any]]]:
+def flatten(
+    data: DeclarativeBase | Sequence[DeclarativeBase],
+) -> dict[Table, list[dict[str, Any]]]:
     """Flatten SQLAlchemy models to dictionaries ready for bulk insertion."""
 
     if not isinstance(data, Sequence):
