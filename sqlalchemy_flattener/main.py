@@ -32,9 +32,6 @@ STRINGIFY_UUIDS = True
 STRINGIFY_DATES = True
 USE_ENUM_VALUES = True
 
-# TODO: improve global variable use
-back_populates_tracker = []
-
 
 def flatten_instance(
     model: DeclarativeBase, data_map: dict[Table, list[dict[str, Any]]]
@@ -45,27 +42,49 @@ def flatten_instance(
     _append_mapping(data_map, model.__table__, model_columns_to_dict(model))
 
     for relationship in inspector.mapper.relationships:
-        # avoid infinite recursion when circular references are present
-        if relationship.back_populates:
-            if (
-                combination := {model.__tablename__, relationship.target.name}
-            ) in back_populates_tracker:
-                continue
-
-            back_populates_tracker.append(combination)
         if relationship.uselist:
             collection = getattr(model, relationship.key)
             if isinstance(collection, KeyFuncDict):
                 collection = collection.values()
             for child in collection:
+                if relationship.secondary is not None:
+                    secondary_dict = generate_secondary_row(relationship, model, child)
+                    # check that the secondary row is not already present - ID values could be random
+                    if not (secondary_records := data_map.get(relationship.secondary)):
+                        _append_mapping(
+                            data_map, relationship.secondary, secondary_dict
+                        )
+                    elif not any(
+                        {
+                            k: v
+                            for k, v in secondary_dict.items()
+                            if k != SECONDARY_ID_COLUMN_NAME
+                        }
+                        == {
+                            k: v
+                            for k, v in record.items()
+                            if k != SECONDARY_ID_COLUMN_NAME
+                        }
+                        for record in secondary_records
+                    ):
+                        _append_mapping(
+                            data_map, relationship.secondary, secondary_dict
+                        )
+                # avoid infinite recursion when circular references are present
+                if (entries := data_map.get(child.__table__)) and any(
+                    str(entry.get("id")) == str(child.id) for entry in entries
+                ):
+                    continue
                 # recursive flattening
                 data_map = flatten_instance(child, data_map)
 
-                if relationship.secondary is not None:
-                    secondary_dict = generate_secondary_row(relationship, model, child)
-                    _append_mapping(data_map, relationship.secondary, secondary_dict)
         else:
             if (child := getattr(model, relationship.key)) is not None:
+                # avoid infinite recursion when circular references are present
+                if (entries := data_map.get(child.__table__)) and any(
+                    str(entry.get("id")) == str(child.id) for entry in entries
+                ):
+                    return data_map
                 data_map = flatten_instance(child, data_map)
 
     return data_map
