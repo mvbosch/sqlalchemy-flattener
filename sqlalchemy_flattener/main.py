@@ -34,21 +34,23 @@ USE_ENUM_VALUES = True
 
 
 def flatten_instance(
-    model: DeclarativeBase, data_map: dict[Table, list[dict[str, Any]]]
+    instance: DeclarativeBase, data_map: dict[Table, list[dict[str, Any]]]
 ) -> dict[Table, list[dict[str, Any]]]:
     """Flatten SQLAlchemy models to dictionaries ready for bulk insertion."""
 
-    inspector = inspect(model)
-    _append_mapping(data_map, model.__table__, model_columns_to_dict(model))
+    inspector = inspect(instance)
+    _append_mapping(data_map, instance.__table__, model_columns_to_dict(instance))
 
     for relationship in inspector.mapper.relationships:
         if relationship.uselist:
-            collection = getattr(model, relationship.key)
+            collection = getattr(instance, relationship.key)
             if isinstance(collection, KeyFuncDict):
                 collection = collection.values()
             for child in collection:
                 if relationship.secondary is not None:
-                    secondary_dict = generate_secondary_row(relationship, model, child)
+                    secondary_dict = generate_secondary_row(
+                        relationship, instance, child
+                    )
                     # check that the secondary row is not already present - ID values could be random
                     if not (secondary_records := data_map.get(relationship.secondary)):
                         _append_mapping(
@@ -79,7 +81,7 @@ def flatten_instance(
                 data_map = flatten_instance(child, data_map)
 
         else:
-            if (child := getattr(model, relationship.key)) is not None:
+            if (child := getattr(instance, relationship.key)) is not None:
                 # avoid infinite recursion when circular references are present
                 if (entries := data_map.get(child.__table__)) and any(
                     str(entry.get("id")) == str(child.id) for entry in entries
