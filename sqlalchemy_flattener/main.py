@@ -47,7 +47,9 @@ def flatten_instance(
     for relationship in inspector.mapper.relationships:
         # avoid infinite recursion when circular references are present
         if relationship.back_populates:
-            if (combination := {model.__tablename__, relationship.target.name}) in back_populates_tracker:
+            if (
+                combination := {model.__tablename__, relationship.target.name}
+            ) in back_populates_tracker:
                 continue
 
             back_populates_tracker.append(combination)
@@ -69,7 +71,9 @@ def flatten_instance(
     return data_map
 
 
-def _append_mapping(data_map: dict[Table, list[dict[str, Any]]], table: Table, data_row: dict[str, Any]) -> Any:
+def _append_mapping(
+    data_map: dict[Table, list[dict[str, Any]]], table: Table, data_row: dict[str, Any]
+) -> Any:
     if table not in data_map:
         data_map[table] = []
     data_map[table].append(data_row)
@@ -91,7 +95,9 @@ def generate_secondary_row(
         if STRINGIFY_UUIDS and isinstance(secondary_dict[column.name], UUID):
             secondary_dict[column.name] = str(secondary_dict[column.name])
     if INSERT_SECONDARY_ID:
-        secondary_dict[SECONDARY_ID_COLUMN_NAME] = str(uuid4()) if STRINGIFY_UUIDS else uuid4()
+        secondary_dict[SECONDARY_ID_COLUMN_NAME] = (
+            str(uuid4()) if STRINGIFY_UUIDS else uuid4()
+        )
 
     return secondary_dict
 
@@ -111,10 +117,15 @@ def flatten(
     return deduplicate_data_mapping(data_map)
 
 
-def deduplicate_data_mapping(data_map: dict[Table, list[dict[str, Any]]]) -> dict[Table, list[dict[str, Any]]]:
+def deduplicate_data_mapping(
+    data_map: dict[Table, list[dict[str, Any]]],
+) -> dict[Table, list[dict[str, Any]]]:
     """Deduplicate data mapping values."""
 
-    return {table: [dict(t) for t in {tuple(d.items()) for d in values}] for table, values in data_map.items()}
+    return {
+        table: [dict(t) for t in {tuple(d.items()) for d in values}]
+        for table, values in data_map.items()
+    }
 
 
 def write_raw(data: dict[Table, list[dict[str, Any]]], path: str) -> None:
