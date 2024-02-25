@@ -1,26 +1,30 @@
 {
-    "files.exclude": {
-        "**/._*": true,
-        "**/*.pyc": {
-            "when": "$(basename).py"
-        },
-        "**/__pycache__": true,
-        "**/.pytest_cache": true,
-        ".coverage": true,
-        ".idea": true,
-        ".mypy_cache": true,
-        ".pytest_cache": true,
-        ".ruff_cache": true,
-        ".venv": false,
+  "files.exclude": {
+    "**/._*": true,
+    "**/*.pyc": {
+      "when": "$(basename).py"
     },
-    "python.testing.pytestArgs": [
-        "tests"
-    ],
-    "python.testing.unittestEnabled": false,
-    "python.testing.pytestEnabled": true,
-    "[python]": {
-        "editor.formatOnSave": true,
-        "editor.defaultFormatter": "ms-python.black-formatter"
+    "**/__pycache__": true,
+    "**/.pytest_cache": true,
+    ".coverage": true,
+    ".idea": true,
+    ".mypy_cache": true,
+    ".pytest_cache": true,
+    ".ruff_cache": true,
+    ".venv": false
+  },
+  "python.testing.pytestArgs": ["tests"],
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestEnabled": true,
+  "[python]": {
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "explicit",
+        "source.fixAll": "explicit"
     },
-    "black-formatter.args": ["--line-length", "120"],
+    "editor.defaultFormatter": "charliermarsh.ruff",
+  },
+  "ruff.lint.args": [
+    "--config=./pyproject.toml"
+  ]
 }
