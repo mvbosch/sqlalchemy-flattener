@@ -10,11 +10,12 @@ from examples.models import (
     Supplier,
     SupplierCategory,
 )
-from sqlalchemy_flattener import flatten
+from sqlalchemy_flattener import SQLAlchemyFlattener
 
 
 def test_flatten_model_instance(suppliers: Supplier) -> None:
-    data = flatten(suppliers)
+    flattener = SQLAlchemyFlattener()
+    data = flattener.flatten(suppliers)
 
     assert all(
         d in data[Supplier.__table__]
@@ -124,7 +125,8 @@ def test_flatten_model_instance(suppliers: Supplier) -> None:
 
 
 def test_dedupe_many_to_many(supplier_categories: list[Supplier]) -> None:
-    data = flatten(supplier_categories)
+    flattener = SQLAlchemyFlattener()
+    data = flattener.flatten(supplier_categories)
     assert len(data[Category.__table__]) == 2
     assert all(
         d in data[Category.__table__]

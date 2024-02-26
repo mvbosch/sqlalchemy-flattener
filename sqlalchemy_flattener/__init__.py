@@ -1,3 +1,3 @@
-from .main import flatten, write_raw, write_sql
+from .flattener import SQLAlchemyFlattener
 
-__all__ = ["flatten", "write_raw", "write_sql"]
+__all__ = ["SQLAlchemyFlattener"]
