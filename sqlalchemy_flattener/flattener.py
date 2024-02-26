@@ -79,11 +79,7 @@ class SQLAlchemyFlattener:
                         # check that the secondary row is not already present - ID values could be random
                         if not (
                             secondary_records := data_map.get(relationship.secondary)
-                        ):
-                            self._append_mapping(
-                                data_map, relationship.secondary, secondary_dict
-                            )
-                        elif not any(
+                        ) or not any(
                             {
                                 k: v
                                 for k, v in secondary_dict.items()
@@ -113,7 +109,7 @@ class SQLAlchemyFlattener:
                     if (entries := data_map.get(child.__table__)) and any(
                         str(entry.get("id")) == str(child.id) for entry in entries
                     ):
-                        return data_map
+                        continue
                     data_map = self.flatten_instance(child, data_map)
 
         return data_map
