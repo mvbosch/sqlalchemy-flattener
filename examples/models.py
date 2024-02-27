@@ -57,11 +57,17 @@ class Contact(Base):
     name: Mapped[str] = mapped_column(Text(), nullable=False)
     email: Mapped[str] = mapped_column(Text(), nullable=True)
     # foreign keys
-    address_id: Mapped[UUID] = mapped_column(Uuid(), ForeignKey("address.id"), nullable=False)
-    supplier_id: Mapped[UUID] = mapped_column(Uuid(), ForeignKey("supplier.id"), nullable=False)
+    address_id: Mapped[UUID] = mapped_column(
+        Uuid(), ForeignKey("address.id"), nullable=False
+    )
+    supplier_id: Mapped[UUID] = mapped_column(
+        Uuid(), ForeignKey("supplier.id"), nullable=False
+    )
     # relationships
     address: Mapped[Address] = relationship(lazy="noload")
-    supplier: Mapped["Supplier"] = relationship(lazy="noload", back_populates="contacts")
+    supplier: Mapped["Supplier"] = relationship(
+        lazy="noload", back_populates="contacts"
+    )
 
 
 class Supplier(Base):
@@ -77,8 +83,12 @@ class Supplier(Base):
     # relationships
     address: Mapped[Address] = relationship(lazy="noload")
     bank_details: Mapped[BankDetails] = relationship(lazy="noload")
-    categories: Mapped[list[Category]] = relationship(lazy="noload", secondary="supplier_category")
-    contacts: Mapped[list[Contact]] = relationship(lazy="noload", back_populates="supplier")
+    categories: Mapped[list[Category]] = relationship(
+        lazy="noload", secondary="supplier_category"
+    )
+    contacts: Mapped[list[Contact]] = relationship(
+        lazy="noload", back_populates="supplier"
+    )
 
 
 class SupplierCategory(Base):
@@ -88,3 +98,6 @@ class SupplierCategory(Base):
 
     supplier_id: Mapped[UUID] = mapped_column(Uuid(), ForeignKey("supplier.id"))
     category_id: Mapped[UUID] = mapped_column(Uuid(), ForeignKey("category.id"))
+
+
+INSERT_ORDER = [Address, BankDetails, Category, Supplier, SupplierCategory, Contact]
