@@ -20,3 +20,6 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.ruff.isort]
 known-first-party = ["sqlalchemy_flattener", "tests", "examples"]
+
+[project.scripts]
+sqlflat = sqlalchemy_flattener.__main__
