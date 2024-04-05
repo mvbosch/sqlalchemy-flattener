@@ -1,5 +1,8 @@
 import argparse
 import importlib
+import sys
+from collections.abc import Callable
+from pathlib import Path
 
 from sqlalchemy_flattener.flattener import SQLAlchemyFlattener
 from sqlalchemy_flattener.writers import write_as_dict, write_as_sql
@@ -31,9 +34,13 @@ def main() -> None:
     )
 
     args = parser.parse_args()
+
+    sys.path.append(Path.cwd())
     instance_path, instance_var = args.instances.rsplit(".", 1)
     module = importlib.import_module(instance_path)
     instances = getattr(module, instance_var)
+    if isinstance(instances, Callable):
+        instances = instances()
 
     order_path, order_var = args.order.rsplit(".", 1)
     module = importlib.import_module(order_path)
