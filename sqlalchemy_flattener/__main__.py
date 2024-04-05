@@ -35,7 +35,7 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    sys.path.append(Path.cwd())
+    sys.path.append(str(Path.cwd()))
     instance_path, instance_var = args.instances.rsplit(".", 1)
     module = importlib.import_module(instance_path)
     instances = getattr(module, instance_var)
