@@ -4,6 +4,8 @@ import sys
 from collections.abc import Callable
 from pathlib import Path
 
+from sqlalchemy import Table
+
 from sqlalchemy_flattener.flattener import SQLAlchemyFlattener
 from sqlalchemy_flattener.writers import write_as_dict, write_as_sql
 
@@ -49,11 +51,11 @@ def main() -> None:
     flattener = SQLAlchemyFlattener()
     unordered_data = flattener.flatten(instances)
 
-    ordered_mapping = {
-        model.__table__: data
-        for model in order
-        if (data := unordered_data.get(model.__table__)) is not None
-    }
+    ordered_mapping = {}
+    for obj in order:
+        attr = obj if isinstance(obj, Table) else obj.__table__
+        if data := unordered_data.get(attr):
+            ordered_mapping[attr] = data
 
     if args.format == "dict":
         write_as_dict(ordered_mapping, args.output)
