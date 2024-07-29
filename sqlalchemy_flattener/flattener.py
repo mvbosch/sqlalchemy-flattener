@@ -4,7 +4,7 @@ from collections.abc import Sequence
 from datetime import date
 from enum import Enum
 from typing import TYPE_CHECKING, Any, Literal
-from uuid import UUID, uuid4
+from uuid import UUID
 
 from sqlalchemy import inspect
 from sqlalchemy.orm import KeyFuncDict
@@ -24,7 +24,6 @@ class SQLAlchemyFlattener:
         serialize_uuids: bool = True,
         serialize_dates: bool = True,
         use_enum_values: bool = True,
-        generate_secondary_id: bool = True,
     ) -> None:
         """Initialize a flattener instance.
 
@@ -34,14 +33,12 @@ class SQLAlchemyFlattener:
             serialize_uuids: Whether to serialize UUIDs to strings.
             serialize_dates: Whether to serialize dates to strings.
             use_enum_values: Whether to use enum values instead of enum names.
-            generate_secondary_id: Whether to generate a primary key ID for secondary tables.
         """
         self.id_attribute_name = id_attribute_name
         self.id_attribute_type = id_attribute_type
         self.serialize_uuids = serialize_uuids
         self.serialize_dates = serialize_dates
         self.use_enum_values = use_enum_values
-        self.generate_secondary_id = generate_secondary_id
 
     def flatten(
         self,
@@ -131,10 +128,6 @@ class SQLAlchemyFlattener:
             )
             if self.serialize_uuids and isinstance(secondary_dict[column.name], UUID):
                 secondary_dict[column.name] = str(secondary_dict[column.name])
-        if self.generate_secondary_id:
-            secondary_dict[self.id_attribute_name] = (
-                str(uuid4()) if self.serialize_uuids else uuid4()
-            )
 
         return secondary_dict
 

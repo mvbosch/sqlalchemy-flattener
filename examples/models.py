@@ -5,7 +5,7 @@ from enum import Enum
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import DateTime, ForeignKey, Text, Uuid
+from sqlalchemy import Column, DateTime, ForeignKey, Table, Text, Uuid
 from sqlalchemy import Enum as SQLEnum
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
@@ -47,7 +47,13 @@ class BankDetails(Base):
 class Category(Base):
     __tablename__ = "category"
 
-    name: Mapped[str] = mapped_column(Text(), nullable=False)
+    name: Mapped[str] = mapped_column(Text())
+
+
+class Tag(Base):
+    __tablename__ = "tag"
+
+    name: Mapped[str] = mapped_column(Text())
 
 
 class Contact(Base):
@@ -89,15 +95,32 @@ class Supplier(Base):
     contacts: Mapped[list[Contact]] = relationship(
         lazy="noload", back_populates="supplier"
     )
+    tags: Mapped[list[Tag]] = relationship(lazy="noload", secondary="supplier_tag")
 
 
-class SupplierCategory(Base):
-    """Supplier to category association table."""
+supplier_category_association = Table(
+    "supplier_category",
+    Base.metadata,
+    Column("supplier_id", Uuid(), ForeignKey("supplier.id"), primary_key=True),
+    Column("category_id", Uuid(), ForeignKey("category.id"), primary_key=True),
+)
 
-    __tablename__ = "supplier_category"
 
-    supplier_id: Mapped[UUID] = mapped_column(Uuid(), ForeignKey("supplier.id"))
-    category_id: Mapped[UUID] = mapped_column(Uuid(), ForeignKey("category.id"))
+supplier_tag_association = Table(
+    "supplier_tag",
+    Base.metadata,
+    Column("supplier_id", Uuid(), ForeignKey("supplier.id"), primary_key=True),
+    Column("tag_id", Uuid(), ForeignKey("tag.id"), primary_key=True),
+)
 
 
-INSERT_ORDER = [Address, BankDetails, Category, Supplier, SupplierCategory, Contact]
+INSERT_ORDER = [
+    Address,
+    BankDetails,
+    Category,
+    Supplier,
+    Contact,
+    Tag,
+    supplier_category_association,
+    supplier_tag_association,
+]

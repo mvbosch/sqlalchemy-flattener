@@ -1,14 +1,13 @@
 from __future__ import annotations
 
-from unittest.mock import ANY
-
 from examples.models import (
     Address,
     BankDetails,
     Category,
     Contact,
     Supplier,
-    SupplierCategory,
+    supplier_category_association,
+    supplier_tag_association,
 )
 from sqlalchemy_flattener import SQLAlchemyFlattener
 
@@ -77,32 +76,29 @@ def test_flatten_model_instance(suppliers: Supplier) -> None:
             {"name": "ISP", "id": "f66c3eb7-7b93-4d9f-bc66-8ff07353f5e7"},
         ]
     )
-    assert len(data[SupplierCategory.__table__]) == 4
+    assert len(data[supplier_category_association]) == 4
     assert all(
-        d in data[SupplierCategory.__table__]
+        d in data[supplier_category_association]
         for d in [
             {
                 "supplier_id": "2b7e7211-d2c7-4eb4-8c14-05ed58c77473",
                 "category_id": "3674c73c-a967-493f-9a4b-5b70f78a5a99",
-                "id": ANY,
             },
             {
                 "supplier_id": "2b7e7211-d2c7-4eb4-8c14-05ed58c77473",
                 "category_id": "f66c3eb7-7b93-4d9f-bc66-8ff07353f5e7",
-                "id": ANY,
             },
             {
                 "supplier_id": "8f4f00f7-3352-4579-84ef-e2f8a455afc3",
                 "category_id": "3674c73c-a967-493f-9a4b-5b70f78a5a99",
-                "id": ANY,
             },
             {
                 "supplier_id": "8f4f00f7-3352-4579-84ef-e2f8a455afc3",
                 "category_id": "f66c3eb7-7b93-4d9f-bc66-8ff07353f5e7",
-                "id": ANY,
             },
         ]
     )
+    assert len(data[supplier_tag_association]) == 1
     assert all(
         d in data[Contact.__table__]
         for d in [
@@ -135,29 +131,25 @@ def test_dedupe_many_to_many(supplier_categories: list[Supplier]) -> None:
             {"name": "ISP", "id": "f66c3eb7-7b93-4d9f-bc66-8ff07353f5e7"},
         ]
     )
-    assert len(data[SupplierCategory.__table__]) == 4
+    assert len(data[supplier_category_association]) == 4
     assert all(
-        d in data[SupplierCategory.__table__]
+        d in data[supplier_category_association]
         for d in [
             {
                 "supplier_id": "330b18d4-5b92-49e5-b899-394dafd19e95",
                 "category_id": "3674c73c-a967-493f-9a4b-5b70f78a5a99",
-                "id": ANY,
             },
             {
                 "supplier_id": "330b18d4-5b92-49e5-b899-394dafd19e95",
                 "category_id": "f66c3eb7-7b93-4d9f-bc66-8ff07353f5e7",
-                "id": ANY,
             },
             {
                 "supplier_id": "ca8e7bb6-898f-47d4-98f8-e5b560ed364e",
                 "category_id": "3674c73c-a967-493f-9a4b-5b70f78a5a99",
-                "id": ANY,
             },
             {
                 "supplier_id": "ca8e7bb6-898f-47d4-98f8-e5b560ed364e",
                 "category_id": "f66c3eb7-7b93-4d9f-bc66-8ff07353f5e7",
-                "id": ANY,
             },
         ]
     )
