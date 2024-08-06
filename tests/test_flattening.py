@@ -16,6 +16,9 @@ def test_flatten_model_instance(suppliers: Supplier) -> None:
     flattener = SQLAlchemyFlattener()
     data = flattener.flatten(suppliers)
 
+    # column properties should not be present
+    assert "tag_count" not in data[Supplier.__table__][0]
+
     assert all(
         d in data[Supplier.__table__]
         for d in [

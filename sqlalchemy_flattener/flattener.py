@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any, Literal
 from uuid import UUID
 
 from sqlalchemy import inspect
-from sqlalchemy.orm import KeyFuncDict
+from sqlalchemy.orm import KeyFuncDict, MappedSQLExpression
 
 if TYPE_CHECKING:
     from sqlalchemy import Table
@@ -149,6 +149,9 @@ class SQLAlchemyFlattener:
 
         mapping: dict[str, str | Enum | date | UUID] = {}
         for column in inspector.mapper.column_attrs:
+            # skip column properties etc.
+            if isinstance(column, MappedSQLExpression):
+                continue
             value = getattr(instance, column.key)
             if self.use_enum_values and isinstance(value, Enum):
                 mapping[column.expression.key] = value.value
