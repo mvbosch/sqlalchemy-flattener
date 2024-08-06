@@ -5,9 +5,15 @@ from enum import Enum
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import Column, DateTime, ForeignKey, Table, Text, Uuid
+from sqlalchemy import Column, DateTime, ForeignKey, Table, Text, Uuid, func, select
 from sqlalchemy import Enum as SQLEnum
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from sqlalchemy.orm import (
+    DeclarativeBase,
+    Mapped,
+    column_property,
+    mapped_column,
+    relationship,
+)
 
 
 class AccountType(str, Enum):
@@ -96,6 +102,10 @@ class Supplier(Base):
         lazy="noload", back_populates="supplier"
     )
     tags: Mapped[list[Tag]] = relationship(lazy="noload", secondary="supplier_tag")
+    # arbitrary column property
+    tag_count: Mapped[int] = column_property(
+        select(func.count(Tag.id)).scalar_subquery()
+    )
 
 
 supplier_category_association = Table(
