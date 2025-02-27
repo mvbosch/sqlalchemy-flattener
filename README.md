@@ -25,5 +25,5 @@ options:
   --format {dict,sql}  The format to write the data in.
 ```
 
-Where `insertion_ordering_list` is a list of model classes, not instances.
+Where `insertion_ordering_list` is a list of model classes *or* `sqlalchemy.Table` instances, but not declarative model instances.
 Take a look at the examples directory.
