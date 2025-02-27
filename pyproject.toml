@@ -2,7 +2,7 @@
 name = "sqlalchemy-flattener"
 version = "0.4.1"
 description = "Flatten SQLAlchemy model trees to raw data"
-authors = ["Michael Bosch <michael@lonelyviking.com>"]
+authors = ["Michael Bosch <michael@vonbosch.co.za>"]
 license = "MIT"
 readme = "README.md"
 
