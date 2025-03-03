@@ -1,4 +1,5 @@
 """This module contains functions for writing data mappings to files."""
+
 from __future__ import annotations
 
 from datetime import date
@@ -31,10 +32,12 @@ def write_as_sql(data: dict[Table, list[dict[str, Any]]], path: str) -> None:
                         value = f"""'{item.replace("'", "''")}'"""
                     elif isinstance(item, date | bool):
                         value = f"'{item}'"
+                    elif isinstance(item, list):
+                        value = f"'{{{', '.join(item)}}}'"
                     else:
                         value = str(item)
                     values.append(value)
-                value_list.append(f'    ({", ".join(values)})')
+                value_list.append(f"    ({', '.join(values)})")
             value_string = ",\n".join(value_list)
             file.write(
                 f"""\nINSERT INTO "{table.name}" ({", ".join(data_list[0].keys())})\nVALUES\n{value_string};\n"""

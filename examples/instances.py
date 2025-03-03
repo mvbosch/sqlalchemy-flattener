@@ -1,12 +1,21 @@
 from datetime import datetime
 from uuid import UUID
 
-from .models import AccountType, Address, BankDetails, Category, Contact, Supplier
+from .models import (
+    AccountType,
+    Address,
+    BankDetails,
+    Category,
+    Contact,
+    Supplier,
+    SupplierTag,
+)
 
 nested_supplier = Supplier(
     id=UUID("2b7e7211-d2c7-4eb4-8c14-05ed58c77473"),
     name="Loros Grist",
     email="info@loros.example",
+    tags=[SupplierTag.CHEAP, SupplierTag.RELIABLE],
     created_at=datetime(2020, 2, 21),
     address_id=UUID("c5fb851f-63fd-4572-872c-3597186c9afe"),
     bank_details_id=UUID("ccd390cf-a74c-4897-a923-3d77ce1b97bf"),

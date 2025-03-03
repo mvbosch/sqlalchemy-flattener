@@ -7,7 +7,7 @@ from examples.models import (
     Contact,
     Supplier,
     supplier_category_association,
-    supplier_tag_association,
+    SupplierTag,
 )
 from sqlalchemy_flattener import SQLAlchemyFlattener
 
@@ -17,7 +17,7 @@ def test_flatten_model_instance(suppliers: Supplier) -> None:
     data = flattener.flatten(suppliers)
 
     # column properties should not be present
-    assert "tag_count" not in data[Supplier.__table__][0]
+    assert "category_count" not in data[Supplier.__table__][0]
 
     assert all(
         d in data[Supplier.__table__]
@@ -29,6 +29,7 @@ def test_flatten_model_instance(suppliers: Supplier) -> None:
                 "address_id": "c5fb851f-63fd-4572-872c-3597186c9afe",
                 "bank_details_id": "ccd390cf-a74c-4897-a923-3d77ce1b97bf",
                 "id": "2b7e7211-d2c7-4eb4-8c14-05ed58c77473",
+                "tags": [SupplierTag.CHEAP, SupplierTag.RELIABLE],
             },
             {
                 "created_at": "2020-02-21 00:00:00",
@@ -37,6 +38,7 @@ def test_flatten_model_instance(suppliers: Supplier) -> None:
                 "address_id": "c307f778-1888-4077-9888-55bce7738738",
                 "bank_details_id": "0cb8bffb-7323-46de-88e0-3a9f3a7edfcf",
                 "id": "8f4f00f7-3352-4579-84ef-e2f8a455afc3",
+                "tags": None,
             },
         ]
     )
@@ -101,7 +103,6 @@ def test_flatten_model_instance(suppliers: Supplier) -> None:
             },
         ]
     )
-    assert len(data[supplier_tag_association]) == 1
     assert all(
         d in data[Contact.__table__]
         for d in [

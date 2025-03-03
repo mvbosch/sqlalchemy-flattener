@@ -7,6 +7,8 @@ from uuid import UUID
 
 from sqlalchemy import Column, DateTime, ForeignKey, Table, Text, Uuid, func, select
 from sqlalchemy import Enum as SQLEnum
+from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.ext.mutable import MutableList
 from sqlalchemy.orm import (
     DeclarativeBase,
     Mapped,
@@ -56,10 +58,9 @@ class Category(Base):
     name: Mapped[str] = mapped_column(Text())
 
 
-class Tag(Base):
-    __tablename__ = "tag"
-
-    name: Mapped[str] = mapped_column(Text())
+class SupplierTag(str, Enum):
+    CHEAP = "cheap"
+    RELIABLE = "reliable"
 
 
 class Contact(Base):
@@ -76,10 +77,8 @@ class Contact(Base):
         Uuid(), ForeignKey("supplier.id"), nullable=False
     )
     # relationships
-    address: Mapped[Address] = relationship(lazy="noload")
-    supplier: Mapped["Supplier"] = relationship(
-        lazy="noload", back_populates="contacts"
-    )
+    address: Mapped[Address] = relationship(lazy="raise")
+    supplier: Mapped["Supplier"] = relationship(lazy="raise", back_populates="contacts")
 
 
 class Supplier(Base):
@@ -89,22 +88,32 @@ class Supplier(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime())
     email: Mapped[str] = mapped_column(Text())
     name: Mapped[str] = mapped_column(Text())
+    tags: Mapped[list[SupplierTag]] = mapped_column(
+        MutableList.as_mutable(
+            ARRAY(
+                SQLEnum(
+                    SupplierTag,
+                    values_callable=lambda t: [e.value for e in t],
+                    name="supplier_tag",
+                )
+            )
+        )
+    )
     # foreign keys
     address_id: Mapped[UUID] = mapped_column(Uuid(), ForeignKey("address.id"))
     bank_details_id: Mapped[UUID] = mapped_column(Uuid(), ForeignKey("bank_details.id"))
     # relationships
-    address: Mapped[Address] = relationship(lazy="noload")
-    bank_details: Mapped[BankDetails] = relationship(lazy="noload")
+    address: Mapped[Address] = relationship(lazy="raise")
+    bank_details: Mapped[BankDetails] = relationship(lazy="raise")
     categories: Mapped[list[Category]] = relationship(
-        lazy="noload", secondary="supplier_category"
+        lazy="raise", secondary="supplier_category"
     )
     contacts: Mapped[list[Contact]] = relationship(
-        lazy="noload", back_populates="supplier"
+        lazy="raise", back_populates="supplier"
     )
-    tags: Mapped[list[Tag]] = relationship(lazy="noload", secondary="supplier_tag")
     # arbitrary column property
-    tag_count: Mapped[int] = column_property(
-        select(func.count(Tag.id)).scalar_subquery()
+    category_count: Mapped[int] = column_property(
+        select(func.count(Category.id)).scalar_subquery()
     )
 
 
@@ -115,22 +124,11 @@ supplier_category_association = Table(
     Column("category_id", Uuid(), ForeignKey("category.id"), primary_key=True),
 )
 
-
-supplier_tag_association = Table(
-    "supplier_tag",
-    Base.metadata,
-    Column("supplier_id", Uuid(), ForeignKey("supplier.id"), primary_key=True),
-    Column("tag_id", Uuid(), ForeignKey("tag.id"), primary_key=True),
-)
-
-
 INSERT_ORDER = [
     Address,
     BankDetails,
     Category,
     Supplier,
     Contact,
-    Tag,
     supplier_category_association,
-    supplier_tag_association,
 ]
