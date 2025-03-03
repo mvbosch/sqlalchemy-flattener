@@ -3,7 +3,7 @@ name = "sqlalchemy-flattener"
 version = "0.5.0"
 description = "Flatten nested SQLAlchemy model data"
 authors = [
-    { name = "LonelyVikingMichael", email = "michael@lonelyviking.com" }
+    { name = "Michael Bosch", email = "michael@vonbosch.co.za" }
 ]
 readme = "README.md"
 requires-python = ">=3.9,<4.0"
