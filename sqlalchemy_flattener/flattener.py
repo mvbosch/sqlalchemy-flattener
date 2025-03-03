@@ -171,14 +171,3 @@ class SQLAlchemyFlattener:
             mapping[column.expression.key] = value
 
         return mapping
-
-    def deduplicate_data_mapping(
-        self,
-        data_map: dict[Table, list[dict[str, Any]]],
-    ) -> dict[Table, list[dict[str, Any]]]:
-        """Deduplicate data mapping values."""
-
-        return {
-            table: [dict(t) for t in {tuple(d.items()) for d in values}]
-            for table, values in data_map.items()
-        }
