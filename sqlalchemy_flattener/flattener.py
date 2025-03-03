@@ -6,7 +6,9 @@ from enum import Enum
 from typing import TYPE_CHECKING, Any, Literal
 from uuid import UUID
 
+from sqlalchemy import Enum as SQLEnum
 from sqlalchemy import inspect
+from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import KeyFuncDict, MappedSQLExpression
 
 if TYPE_CHECKING:
@@ -53,7 +55,7 @@ class SQLAlchemyFlattener:
         for model in data:
             data_map = self.flatten_instance(model, data_map)
 
-        return self.deduplicate_data_mapping(data_map)
+        return data_map
 
     def flatten_instance(
         self, instance: DeclarativeBase, data_map: dict[Table, list[dict[str, Any]]]
@@ -154,26 +156,18 @@ class SQLAlchemyFlattener:
                 continue
             value = getattr(instance, column.key)
             if self.use_enum_values and isinstance(value, Enum):
-                mapping[column.expression.key] = value.value
-                continue
-            if self.serialize_dates and isinstance(value, date):
-                mapping[column.expression.key] = str(value)
-                continue
-            if self.serialize_uuids and isinstance(value, UUID):
-                mapping[column.expression.key] = str(value)
-                continue
+                value = value.value
+            elif self.serialize_dates and isinstance(value, date):
+                value = str(value)
+            elif self.serialize_uuids and isinstance(value, UUID):
+                value = str(value)
+            elif (
+                value is not None
+                and type(column.expression.type) is ARRAY
+                and type(column.expression.type.item_type) is SQLEnum
+            ):
+                value = [v.value for v in value]
 
             mapping[column.expression.key] = value
 
         return mapping
-
-    def deduplicate_data_mapping(
-        self,
-        data_map: dict[Table, list[dict[str, Any]]],
-    ) -> dict[Table, list[dict[str, Any]]]:
-        """Deduplicate data mapping values."""
-
-        return {
-            table: [dict(t) for t in {tuple(d.items()) for d in values}]
-            for table, values in data_map.items()
-        }

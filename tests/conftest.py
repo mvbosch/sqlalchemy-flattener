@@ -12,7 +12,7 @@ from examples.models import (
     Category,
     Contact,
     Supplier,
-    Tag,
+    SupplierTag,
 )
 
 
@@ -63,7 +63,7 @@ def suppliers(categories: list[Category]) -> tuple[Supplier]:
                     ),
                 ),
             ],
-            tags=[Tag(id=UUID("0a9406c6-c8f2-483b-a78b-46813374c00f"), name="depth")],
+            tags=[SupplierTag.CHEAP, SupplierTag.RELIABLE],
         ),
         Supplier(
             id=UUID("8f4f00f7-3352-4579-84ef-e2f8a455afc3"),
