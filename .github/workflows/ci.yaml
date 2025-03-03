@@ -47,14 +47,18 @@ jobs:
 
       - name: Install dependencies
         run: uv sync --dev
+
       - name: Set pythonpath
         run: echo "PYTHONPATH=$PWD" >> $GITHUB_ENV
+
       - name: Test
         if: matrix.python-version != '3.13'
-        run: poetry run pytest
+        run: uv run pytest
+
       - name: Test with Coverage
         if: matrix.python-version == '3.13'
-        run: poetry run pytest examples tests --cov=sqlalchemy_flattener --cov-report=xml
+        run: uv run pytest examples tests --cov=sqlalchemy_flattener --cov-report=xml
+  
       - uses: actions/upload-artifact@v4
         if: matrix.python-version == '3.13'
         with:
